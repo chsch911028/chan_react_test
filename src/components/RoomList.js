@@ -5,6 +5,7 @@ const RoomList = ({ rooms, bookmark, bookMarkedIds, onBookMarkClick, onRoomImgCl
   return (
     <div>
       {
+        
         rooms.map((user, i) => {
           return (
             <Room

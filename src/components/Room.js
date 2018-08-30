@@ -24,16 +24,18 @@ onRoomImgClick }) => {
 		}
 	}
 
+	const isBookMarkedId = bookMarkedIds.includes(id.toString());
+
   return (
   	<div className='card'>
 	    <div className='room_card' style={roomCardStyle} value={image_url} onClick={onRoomImgClick}>
   	    <div className='status_bar'>
   	    	<div className='room_type'>{typeName(type)}</div>
     	    <img className='bookmark_img' alt='rooms' 
-      	  	src={bookMarkedIds.includes(id.toString()) ? 
+      	  	src={isBookMarkedId ? 
         			'https://s3.ap-northeast-2.amazonaws.com/bucketplace-coding-test/res/action-scrap-circle-b.svg' :
         			'https://s3.ap-northeast-2.amazonaws.com/bucketplace-coding-test/res/action-scrap-circle-w.svg'}
-        		id={id} onClick={onBookMarkClick}  />
+        		roomid={id} onClick={onBookMarkClick}  />
       	</div>
     	</div>
     </div>
