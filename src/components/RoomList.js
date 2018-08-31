@@ -3,9 +3,9 @@ import Room from './Room';
 
 const RoomList = ({ rooms, bookmark, bookMarkedIds, onBookMarkClick, onRoomImgClick }) => {
   return (
-    <div>
+    <div className='room_list'>
       {
-        
+
         rooms.map((user, i) => {
           return (
             <Room

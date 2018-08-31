@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+//import InfiniteScroll from 'react-infinite-scroller';
 import { 
   setFilterValue, 
   changeBookMarkView, changeBookMarkedIds, 
   roomImgClick, modalViewClick,
   addBookMarkAlert, removeBookMarkAlert, forceRemoveBookMarkAlert, removeBookMarkAlertAsync,
   adjustBookMarkAlert, updateStatusBookMarkAlertAsync, mouseOverBookMarkAlert, mouseOutBookMarkAlert,
-  requestRooms } from '../actions';
+  requestRooms, requestRoomsAsync } from '../actions';
 
+//components
+import Nav from '../components/Nav';
 import RoomList from '../components/RoomList';
 import FilterBox from '../components/FilterBox';
 import Scroll from '../components/Scroll';
 import BookMarkAlertList from '../components/BookMarkAlertList';
+
 
 import './App.css';
 
@@ -90,6 +94,13 @@ const mapDispatchToProps = (dispatch) => {
     onRoomImgClick : (event) => dispatch( roomImgClick(event.currentTarget.getAttribute('value')) ),
     onModalViewClick : () => dispatch( modalViewClick()),
     onRequestRooms : () => dispatch( requestRooms() ),
+    onInfiniteScroll : (event) => {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {          
+          dispatch( requestRoomsAsync() );
+          console.log("bottom");
+        }            
+    },
+
   }
 }
 
@@ -98,29 +109,35 @@ class App extends Component {
 
   componentDidMount() {
     this.props.onRequestRooms();
+    window.addEventListener('scroll', this.props.onInfiniteScroll);
+  }
 
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.props.onInfiniteScroll);
   }
 
   render() {
 
     const {  
+      onInfiniteScroll,
       filterValue, onFilterChange, 
       isBookMarkView, onChangeBookMarkView, 
       onChangeBookMarkIds, bookMarkedIds, bookMarkChangedType, onUndoBookMark, onUpdateStatusBMAV,
       onRoomImgClick, onModalViewClick, roomImageId, roomImageClicked,
-      rooms, isPending,
+      rooms, isPending, page,
       alerts } = this.props;
-    
+
     const bookMakredRooms = rooms.filter( room => {
       return bookMarkedIds.includes(room.id.toString());
     });
 
     const handledRooms = isBookMarkView === 'true' ? bookMakredRooms : rooms;
 
-    const flteredRooms = handledRooms.filter( room => {
+    const filteredRooms = handledRooms.filter( room => {
       return room.type.toLowerCase().includes(filterValue.toLowerCase());
     });
 
+    console.log(page)
 
     return (
         <div className='main'>
@@ -132,21 +149,19 @@ class App extends Component {
             : undefined
           } 
           <h1>오늘의 집</h1>
-          <div className='nav_bar'>
-            <span className={ isBookMarkView === 'true' ? 'nav_item' : 'nav_item_focus'}
-                  value='false' onClick={onChangeBookMarkView}>전체보기</span>
-            <span className={ isBookMarkView === 'true' ? 'nav_item_focus' : 'nav_item'}
-                  value='true' onClick={onChangeBookMarkView}>북마크</span>
-          </div>
+          <Nav onChangeBookMarkView={onChangeBookMarkView} />
           <FilterBox filterValue={filterValue} onFilterChange={onFilterChange}/>
-          <Scroll>
+          
+          <Scroll>          
             { isPending ? <h1>로딩중</h1> :
-              <RoomList className='room_list'
-               rooms={flteredRooms} bookMarkedIds={bookMarkedIds} onBookMarkClick={onChangeBookMarkIds}
+              <RoomList
+               rooms={filteredRooms} bookMarkedIds={bookMarkedIds} 
+               onBookMarkClick={onChangeBookMarkIds}
                onRoomImgClick={onRoomImgClick}
               />
             }
           </Scroll>
+
           <BookMarkAlertList 
               alerts={alerts}
               onUndoBookMark={onUndoBookMark}

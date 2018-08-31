@@ -2,7 +2,7 @@ import React from 'react';
 
 const Scroll = (props) => {
   return (
-    <div>
+    <div className='scroll-box'>
       {props.children}
     </div>
   );

@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
 import { requestRooms, filterRooms, bookmarkRooms, viewRooms,
 				 bookMarkAlerts } from './reducers';
+import { BrowserRouter, Route } from 'react-router-dom';
 
 import App from './containers/App';
 import registerServiceWorker from './registerServiceWorker';
@@ -18,7 +19,9 @@ const store = createStore(rootReducers, applyMiddleware(thunkMiddleware));
 
 ReactDOM.render(
 	<Provider store={store}>
-		<App />
+		<BrowserRouter>
+			<Route path="/" component={App} />
+		</BrowserRouter>
 	</Provider>,
 	 document.getElementById('root')
 );

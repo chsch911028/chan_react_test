@@ -73,17 +73,18 @@ export const viewRooms = (state=initailStateRoomView, action={}) => {
 //#4. 방 관련 JSON 데이터 받아오기
 const initailStateRooms = {
 	rooms: [],
-	isPending: true
+	page : 0,
+	isPending: false,
 }
 
 export const requestRooms = (state=initailStateRooms, action={}) => {
 	switch(action.type){
 		case REQUEST_ROOMS_PENDING:
-			return Object.assign({}, state, {isPending: true})
+			return Object.assign({}, state, {isPending: true, page: state.page})
 		case REQUEST_ROOMS_SUCCESS:
-			return Object.assign({}, state, {rooms: action.payload, isPending: false})
+			return Object.assign({}, state, { rooms : [ ...state.rooms, ...action.payload ], page: state.page + 1, isPending: false})
 		case REQUEST_ROOMS_FAILED:
-			return Object.assign({}, state, {error: action.payload})
+			return Object.assign({}, state, {error: action.payload, isPending: false, page: state.page})
 		default:
 			return state;
 	}

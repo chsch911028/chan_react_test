@@ -35,12 +35,25 @@ export const roomImgClick = (imgURL) => ({ type: ROOM_IMAGE_CLICK, payload: imgU
 export const modalViewClick = () => ({ type: MODAL_VIEW_CLICK, payload: false })
 
 //#4. 방 관련 JSON 데이터 받아오기
-export const requestRooms = () => (dispatch) => {
-	dispatch({ type: REQUEST_ROOMS_PENDING })
-	apiCall('https://s3.ap-northeast-2.amazonaws.com/bucketplace-coding-test/feed/page_1.json')
-	.then(date => dispatch({ type: REQUEST_ROOMS_SUCCESS, payload: date }))
-	.catch(error => dispatch({ type: REQUEST_ROOMS_FAILED, payload: error }))
+export const requestRooms = () => (dispatch, getState) => {
+	if(!getState().requestRooms.isPending){
+		dispatch({ type: REQUEST_ROOMS_PENDING })
+		apiCall('https://s3.ap-northeast-2.amazonaws.com/bucketplace-coding-test/feed/page_'+(getState().requestRooms.page+1)+'.json')
+		.then(date => dispatch({ type: REQUEST_ROOMS_SUCCESS, payload: date }))
+		.catch(error => dispatch({ type: REQUEST_ROOMS_FAILED, payload: error }))
+	}
+}
 
+export const requestRoomsAsync = () => (dispatch, getState) => {
+	
+	if(!getState().requestRooms.isPending){
+		setTimeout( () => {
+			dispatch({ type: REQUEST_ROOMS_PENDING })
+			apiCall('https://s3.ap-northeast-2.amazonaws.com/bucketplace-coding-test/feed/page_'+(getState().requestRooms.page+1)+'.json')
+			.then(date => dispatch({ type: REQUEST_ROOMS_SUCCESS, payload: date }))
+			.catch(error => dispatch({ type: REQUEST_ROOMS_FAILED, payload: error }))	
+		}, 1500)		
+	}	
 }
 
 //#5. 북마크 알림창 
