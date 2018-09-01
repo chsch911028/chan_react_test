@@ -46,9 +46,9 @@ export const requestRooms = () => (dispatch, getState) => {
 
 export const requestRoomsAsync = () => (dispatch, getState) => {
 	
-	if(!getState().requestRooms.isPending){
-		setTimeout( () => {
-			dispatch({ type: REQUEST_ROOMS_PENDING })
+	if(!getState().requestRooms.isPending && !getState().requestRooms.error){
+		dispatch({ type: REQUEST_ROOMS_PENDING })
+		setTimeout( () => {			
 			apiCall('https://s3.ap-northeast-2.amazonaws.com/bucketplace-coding-test/feed/page_'+(getState().requestRooms.page+1)+'.json')
 			.then(date => dispatch({ type: REQUEST_ROOMS_SUCCESS, payload: date }))
 			.catch(error => dispatch({ type: REQUEST_ROOMS_FAILED, payload: error }))	

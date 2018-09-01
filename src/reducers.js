@@ -80,11 +80,11 @@ const initailStateRooms = {
 export const requestRooms = (state=initailStateRooms, action={}) => {
 	switch(action.type){
 		case REQUEST_ROOMS_PENDING:
-			return Object.assign({}, state, {isPending: true, page: state.page})
+			return Object.assign({}, state, { isPending: true } )
 		case REQUEST_ROOMS_SUCCESS:
-			return Object.assign({}, state, { rooms : [ ...state.rooms, ...action.payload ], page: state.page + 1, isPending: false})
+			return { ...state, rooms: [ ...state.rooms, action.payload ], page: state.page+1, isPending: false }			
 		case REQUEST_ROOMS_FAILED:
-			return Object.assign({}, state, {error: action.payload, isPending: false, page: state.page})
+			return Object.assign({}, state, { error: action.payload, isPending: false })
 		default:
 			return state;
 	}

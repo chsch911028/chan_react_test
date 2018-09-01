@@ -30,6 +30,7 @@ const mapStateToProps = (state) => {
     roomImageId: state.viewRooms.roomImageId,
 
     rooms: state.requestRooms.rooms,
+    page: state.requestRooms.page,
     isPending: state.requestRooms.isPending,
 
     alerts: state.bookMarkAlerts.alerts
@@ -42,6 +43,9 @@ const mapDispatchToProps = (dispatch) => {
   return{
     
     onFilterChange : (event) => dispatch( setFilterValue(event.currentTarget.getAttribute('value')) ),    
+    onRouterChanged : (obj) => {
+      obj.pathname === '/book-mark' ? dispatch( changeBookMarkView(obj.value) ) : undefined;
+    },
     onChangeBookMarkView : (event) => {
       dispatch(changeBookMarkView(event.currentTarget.getAttribute('value')))
     },
@@ -108,7 +112,9 @@ const mapDispatchToProps = (dispatch) => {
 class App extends Component {
 
   componentDidMount() {
-    this.props.onRequestRooms();
+    
+    this.props.location.pathname === '/book-mark' ? this.props.onRouterChanged({ pathname: this.props.location.pathname, value:'true' }) : undefined;
+    this.props.onRequestRooms();    
     window.addEventListener('scroll', this.props.onInfiniteScroll);
   }
 
@@ -126,18 +132,33 @@ class App extends Component {
       onRoomImgClick, onModalViewClick, roomImageId, roomImageClicked,
       rooms, isPending, page,
       alerts } = this.props;
+    
 
-    const bookMakredRooms = rooms.filter( room => {
-      return bookMarkedIds.includes(room.id.toString());
+    const bookMakredRooms = rooms.map( roomArr => {
+      return roomArr.filter( room => {
+        return bookMarkedIds.includes(room.id.toString());
+      })      
     });
+
+    /*
+    const bookMakredRooms = rooms.filter( room => {
+        return bookMarkedIds.includes(room.id.toString());
+    });
+    */
 
     const handledRooms = isBookMarkView === 'true' ? bookMakredRooms : rooms;
 
+    const filteredRooms = handledRooms.map( roomArr => {
+      return roomArr.filter( room => {
+        return room.type.toLowerCase().includes(filterValue.toLowerCase());
+      })      
+    });
+
+/*
     const filteredRooms = handledRooms.filter( room => {
       return room.type.toLowerCase().includes(filterValue.toLowerCase());
     });
-
-    console.log(page)
+*/
 
     return (
         <div className='main'>
@@ -151,17 +172,19 @@ class App extends Component {
           <h1>오늘의 집</h1>
           <Nav onChangeBookMarkView={onChangeBookMarkView} />
           <FilterBox filterValue={filterValue} onFilterChange={onFilterChange}/>
-          
-          <Scroll>          
-            { isPending ? <h1>로딩중</h1> :
-              <RoomList
-               rooms={filteredRooms} bookMarkedIds={bookMarkedIds} 
-               onBookMarkClick={onChangeBookMarkIds}
-               onRoomImgClick={onRoomImgClick}
-              />
+          <Scroll>
+            { 
+              filteredRooms.filter( rooms => { return rooms.length > 0 }).map( (rooms, index) => {
+                return <RoomList key={index}
+                  rooms={rooms} bookMarkedIds={bookMarkedIds} 
+                  onBookMarkClick={onChangeBookMarkIds}
+                  onRoomImgClick={onRoomImgClick}
+                
+                />
+              })              
             }
-          </Scroll>
 
+          </Scroll>
           <BookMarkAlertList 
               alerts={alerts}
               onUndoBookMark={onUndoBookMark}
