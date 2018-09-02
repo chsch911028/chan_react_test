@@ -6,17 +6,17 @@ const RoomList = ({ rooms, bookmark, bookMarkedIds, onBookMarkClick, onRoomImgCl
     <div className='room_list'>
       {
 
-        rooms.map((user, i) => {
+        rooms.map((room, i) => {
           return (
             <Room
               key={i}
-              id={rooms[i].id}
-              type={rooms[i].type}
-              image_url={rooms[i].image_url}
-              brand_name={rooms[i].brand_name}
-              name={rooms[i].name}
-              cost={rooms[i].cost}
-              selling_cost={rooms[i].selling_cost}
+              id={room.id}
+              type={room.type}
+              image_url={room.image_url}
+              brand_name={room.brand_name}
+              name={room.name}
+              cost={room.cost}
+              selling_cost={room.selling_cost}
               onBookMarkClick={onBookMarkClick}
               bookMarkedIds={bookMarkedIds}
 

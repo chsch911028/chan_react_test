@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BookMarkAlert = ({id, status, type, onUndoBookMark, onUpdateStatusBMAV }) => {
+const BookMarkAlert = ({id, type, onUndoBookMark, onUpdateStatusBMAV }) => {
 	let typeName = type === 'add' ? '추가' : '삭제';
   return (
     <div roomid={id} className='alert_box' onMouseEnter={onUpdateStatusBMAV} onMouseLeave={onUpdateStatusBMAV}>

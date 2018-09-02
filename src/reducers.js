@@ -16,8 +16,7 @@ import {
 	FORCE_REMOVE_BOOK_MARK_ALERT,
 	ADJUST_BOOK_MARK_ALERT,
 	MOUSE_OVER_BOOK_MARK_ALERT,
-	MOUSE_OUT_BOOK_MARK_ALERT,
-	UPDATE_STATUS_BOOK_MAKR_ALERT
+	MOUSE_OUT_BOOK_MARK_ALERT
 } from './constants';
 
 
@@ -82,7 +81,7 @@ export const requestRooms = (state=initailStateRooms, action={}) => {
 		case REQUEST_ROOMS_PENDING:
 			return Object.assign({}, state, { isPending: true } )
 		case REQUEST_ROOMS_SUCCESS:
-			return { ...state, rooms: [ ...state.rooms, action.payload ], page: state.page+1, isPending: false }			
+			return { ...state, rooms: [ ...state.rooms, ...action.payload ], page: state.page+1, isPending: false }
 		case REQUEST_ROOMS_FAILED:
 			return Object.assign({}, state, { error: action.payload, isPending: false })
 		default:
@@ -101,7 +100,7 @@ export const bookMarkAlerts = (state=initialStateBoomMarkAlerts, action={}) => {
 		case ADD_BOOK_MARK_ALERT:
 			return { ...state, alerts: [ ...state.alerts.filter( obj => obj.id !== action.payload.id ), action.payload ] }
 		case REMOVE_BOOK_MARK_ALERT:
-			return { ...state, alerts: [ ...state.alerts.filter( obj => (obj.onMouseCnt > obj.outMouseCnt) || (obj.status === 'disable') || (obj.id !== action.payload) ) ] }
+			return { ...state, alerts: [ ...state.alerts.filter( obj => (obj.onMouseCnt > obj.outMouseCnt) || (obj.id !== action.payload) ) ] }
 		case FORCE_REMOVE_BOOK_MARK_ALERT:
 			return { ...state, alerts: [ ...state.alerts.filter( obj => obj.id !== action.payload ) ] }
 		case ADJUST_BOOK_MARK_ALERT:
@@ -109,7 +108,7 @@ export const bookMarkAlerts = (state=initialStateBoomMarkAlerts, action={}) => {
 		case MOUSE_OVER_BOOK_MARK_ALERT :
 			return { ...state, alerts: [ ...state.alerts.map( obj => { 
 								if(obj.id === action.payload.id){
-									return { ...obj, ...action.payload }
+									return { ...obj, ...action.payload, onMouseCnt: obj.onMouseCnt + 1 }
 								}else{
 									return obj 
 								} 
@@ -122,16 +121,8 @@ export const bookMarkAlerts = (state=initialStateBoomMarkAlerts, action={}) => {
 									return obj 
 								} 
 							}) ] }
-		case UPDATE_STATUS_BOOK_MAKR_ALERT:
-			return { ...state, alerts: [ ...state.alerts.map( obj => { 
-								if(obj.id === action.payload.id){
-									return { ...obj, ...action.payload }
-								} else{
-									return obj;
-								}   
-							}) ] };			
-		default: 
-			return state;
+				
+		default: return state;
 	}
 }
 

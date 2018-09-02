@@ -10,9 +10,8 @@ const BookMarkAlertList = ({ alerts, onUndoBookMark, onUpdateStatusBMAV }) => {
           return(
             <BookMarkAlert
               key={i}
-              id={alerts[i].id}
-              status={alerts[i].status}
-              type={alerts[i].type}
+              id={alert.id}
+              type={alert.type}
               onUpdateStatusBMAV={onUpdateStatusBMAV}
               onUndoBookMark={onUndoBookMark}              
             />  
