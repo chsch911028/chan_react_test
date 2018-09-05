@@ -23,7 +23,7 @@ onRoomImgClick }) => {
 			default : return '';
 		}
 	}
-
+	
 	const isBookMarkedId = bookMarkedIds.includes(id.toString());
 
   return (

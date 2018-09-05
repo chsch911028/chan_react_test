@@ -17,7 +17,10 @@ import {
 	FORCE_REMOVE_BOOK_MARK_ALERT,
 	ADJUST_BOOK_MARK_ALERT,
 	MOUSE_OVER_BOOK_MARK_ALERT,
-	MOUSE_OUT_BOOK_MARK_ALERT
+	MOUSE_OUT_BOOK_MARK_ALERT,
+
+	INCREASE_SCROLL_PAGE,
+	RESET_SCROLL_PAGE
 } from './constants'
 
 const BOOK_MARK_ALERT_VIEW_TIME = 3000;
@@ -37,9 +40,18 @@ export const modalViewClick = () => ({ type: MODAL_VIEW_CLICK, payload: false })
 export const requestRooms = () => (dispatch, getState) => {
 
 	if(!getState().requestRooms.isPending){
+		
+		getState().scroll.scrollPage < getState().requestRooms.page
+		? dispatch({ type: INCREASE_SCROLL_PAGE, payload: true})
+		: undefined;
+		
 		dispatch({ type: REQUEST_ROOMS_PENDING })
 		apiCall('https://s3.ap-northeast-2.amazonaws.com/bucketplace-coding-test/feed/page_'+(getState().requestRooms.page+1)+'.json')
-		.then(date => dispatch({ type: REQUEST_ROOMS_SUCCESS, payload: date }))
+		.then(date => {
+			// DATA를 rooms state에 넣어주고, ScrollPage 값도 증가시킴.
+			dispatch({ type: REQUEST_ROOMS_SUCCESS, payload: date })
+			dispatch({ type: INCREASE_SCROLL_PAGE, payload: true})
+		})
 		.catch(error => dispatch({ type: REQUEST_ROOMS_FAILED, payload: error }))
 	}
 }
@@ -73,3 +85,8 @@ export const mouseOverBookMarkAlert = (obj) => ({ type: MOUSE_OVER_BOOK_MARK_ALE
 export const mouseOutBookMarkAlert = (obj) => (dispatch) => {
 	setTimeout( () => { dispatch({ type: MOUSE_OUT_BOOK_MARK_ALERT, payload: obj}) }, BOOK_MARK_ALERT_VIEW_TIME );
 }
+
+
+//#6. Sroll 상태
+export const increaseScrollPage = () => ({ type: INCREASE_SCROLL_PAGE, payload: true })
+export const resetScrollPage = () => ({ type: RESET_SCROLL_PAGE, payload: true})

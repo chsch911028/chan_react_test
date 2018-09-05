@@ -5,7 +5,7 @@ import {
   changeBookMarkView, changeBookMarkedIds, 
   roomImgClick, modalViewClick,
   addBookMarkAlert, forceRemoveBookMarkAlert, removeBookMarkAlertAsync, mouseOverBookMarkAlert, mouseOutBookMarkAlert,
-  requestRooms, 
+  requestRooms, resetScrollPage, 
 } from '../actions';
 
 //components
@@ -35,14 +35,19 @@ const mapStateToProps = (state) => {
     page: state.requestRooms.page,
     isPending: state.requestRooms.isPending,
     //BookMarkAlert 컴포넌트 관련
-    alerts: state.bookMarkAlerts.alerts
+    alerts: state.bookMarkAlerts.alerts,
+    //Scroll 컴포넌트 관련
+    scrollPage: state.scroll.scrollPage
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return{
     //Filter 변경시 - 필터값 변경
-    onFilterChange : (event) => dispatch( setFilterValue(event.currentTarget.getAttribute('value')) ),    
+    onFilterChange : (event) => {
+      dispatch(setFilterValue(event.currentTarget.getAttribute('value')));
+      dispatch(resetScrollPage());
+    },    
     //Router 변경시 - pathname에 따른 이벤트 발생
     onRouterChanged : (obj) => {
       obj.pathname === '/book-mark' ? dispatch( changeBookMarkView(obj.value) ) : undefined;
@@ -105,7 +110,9 @@ const mapDispatchToProps = (dispatch) => {
     onRequestRooms : () => dispatch(requestRooms()),
     // 스크롤이 바닥에 닿은 경우 발생 -> 방 정보 API 통신 요청
     onInfiniteScroll : (event) => {
+
         if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {          
+          console.log('bottome')
           dispatch(requestRooms());
         }            
     },
@@ -139,20 +146,35 @@ class App extends Component {
       isBookMarkView, onChangeBookMarkView, 
       onChangeBookMarkIds, bookMarkedIds, onUndoBookMark, onUpdateStatusBMAV,
       onRoomImgClick, onModalViewClick, roomImageId, roomImageClicked,
-      rooms, alerts } = this.props;
+      rooms, alerts, scrollPage } = this.props;
     
     //1. 북마크된 방(배열) 처리
-    const bookMakredRooms = rooms.filter( room => {
+/*    const bookMarkedRooms = rooms.filter( room => {
         return bookMarkedIds.includes(room.id.toString());
+    });*/
+    const bookMarkedRooms = rooms.map( (roomArr,index) => {
+      return roomArr.filter( room => {
+        return bookMarkedIds.includes(room.id.toString());
+      })      
     });
 
     //2. 북마크된 방을 보여주는 뷰인지 아닌지 판단 -> 그에 따른 방 데이터(배열) 선택
-    const handledRooms = isBookMarkView === 'true' ? bookMakredRooms : rooms;
+    const handledRooms = isBookMarkView === 'true' ? bookMarkedRooms.slice(0,scrollPage) : rooms.slice(0,scrollPage);
 
     //3. 각 카테고리(필터)에 맞는 방(배열) 처리
-    const filteredRooms = handledRooms.filter( room => {
+/*    const filteredRooms = handledRooms.filter( room => {
       return room.type.toLowerCase().includes(filterValue.toLowerCase());
-    });
+    });*/
+/*    const filteredRooms = handledRooms.map( (roomArr) => {
+      return [ ...roomArr.filter( (room) => {
+        return room.type.toLowerCase().includes(filterValue.toLowerCase());
+      }) ];      
+    });*/
+
+    const filteredRooms = handledRooms.reduce( (preRoomArr,curRoomArr,currIndex) => {      
+      let filteredRoomArr = curRoomArr.filter( room => room.type.toLowerCase().includes(filterValue.toLowerCase()) );      
+      return [ ...preRoomArr, ...filteredRoomArr ]
+    }, []);
 
     return (
         <div className='main'>

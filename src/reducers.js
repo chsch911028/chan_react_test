@@ -16,7 +16,10 @@ import {
 	FORCE_REMOVE_BOOK_MARK_ALERT,
 	ADJUST_BOOK_MARK_ALERT,
 	MOUSE_OVER_BOOK_MARK_ALERT,
-	MOUSE_OUT_BOOK_MARK_ALERT
+	MOUSE_OUT_BOOK_MARK_ALERT,
+
+	INCREASE_SCROLL_PAGE,
+	RESET_SCROLL_PAGE
 } from './constants';
 
 
@@ -81,7 +84,7 @@ export const requestRooms = (state=initailStateRooms, action={}) => {
 		case REQUEST_ROOMS_PENDING:
 			return Object.assign({}, state, { isPending: true } )
 		case REQUEST_ROOMS_SUCCESS:
-			return { ...state, rooms: [ ...state.rooms, ...action.payload ], page: state.page+1, isPending: false }
+			return { ...state, rooms: [ ...state.rooms, action.payload ], page: state.page+1, isPending: false }
 		case REQUEST_ROOMS_FAILED:
 			return Object.assign({}, state, { error: action.payload, isPending: false })
 		default:
@@ -126,3 +129,17 @@ export const bookMarkAlerts = (state=initialStateBoomMarkAlerts, action={}) => {
 	}
 }
 
+//#6. Scroll 
+const initialStateScroll = {
+	scrollPage: 0
+}
+
+export const scroll = ( state= initialStateScroll, action={} ) => {
+	switch(action.type){
+		case INCREASE_SCROLL_PAGE:
+			return { ...state, scrollPage: state.scrollPage + 1 }
+		case RESET_SCROLL_PAGE:
+			return { ...state, scrollPage: 1 }
+		default: return state;
+	}
+}
